@@ -1,6 +1,10 @@
 from django.urls import path, include
 
-from .views import CustomRegisterView, UserProfileUpdateView
+from .views import (
+    CustomRegisterView,
+    UserProfileUpdateView,
+    WorkerListAPIView,
+)
 
 
 urlpatterns = [
@@ -8,5 +12,7 @@ urlpatterns = [
 
     path('register/', CustomRegisterView.as_view(), name="user-create"),
     path('profile/update/', UserProfileUpdateView.as_view(), name='profile-update'),
+
+    path('workers/', WorkerListAPIView.as_view(), name='worker-list'),
 
 ]
