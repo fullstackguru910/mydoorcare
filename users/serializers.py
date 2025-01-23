@@ -1,7 +1,7 @@
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from rest_framework import serializers
 
-from users.models import UserProfile
+from users.models import CustomUser, UserProfile
 
 
 class CustomRegisterSerializer(RegisterSerializer):
@@ -20,7 +20,20 @@ class CustomRegisterSerializer(RegisterSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['full_name', 'phone_number', 'address', 'profile_image']
+        fields = ['full_name', 'phone_number', 'address', 'profile_image', 'services']
         extra_kwargs = {
             'profile_image': {'required': False},
         }
+
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = [
+            'id',
+            'email',
+            'custom_role',
+            'profile',
+        ]

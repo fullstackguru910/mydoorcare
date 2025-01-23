@@ -3,8 +3,12 @@ from dj_rest_auth.registration.views import RegisterView
 from rest_framework.generics import UpdateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
-from .models import UserProfile
-from .serializers import CustomRegisterSerializer, UserProfileSerializer
+from .models import CustomUser, UserProfile
+from .serializers import (
+    CustomRegisterSerializer,
+    CustomUserSerializer,
+    UserProfileSerializer,
+)
 
 
 class CustomRegisterView(RegisterView):
@@ -22,12 +26,12 @@ class UserProfileUpdateView(UpdateAPIView):
 
 
 class WorkerListAPIView(ListAPIView):
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().filter(custom_role='WORKER')
 
         service_type = self.request.query_params.get('serviceType', None)
         location = self.request.query_params.get('location', None)
