@@ -1,29 +1,8 @@
 [Unit]
-Description=gunicorn daemon
-Requires=gunicorn.socket
-After=network.target
+Description=gunicorn socket
 
-[Service]
-User=ubuntu
-Group=www-data
-WorkingDirectory=/home/ubuntu/mydoorcare
-
-Environment="MAILGUN_API_KEY="
-Environment="MAILGUN_SENDER_DOMAIN="
-Environment="DB_NAME=mydoorcare"
-Environment="DB_USER=mydoorcare"
-Environment="DB_PASSWORD=mydoorcare"
-Environment="DB_HOST=localhost"
-Environment="DB_PORT=5432"
-Environment="PGUSER=mydoorcare"
-Environment="SOCIAL_AUTH_GOOGLE_OAUTH2_KEY="
-Environment="SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET="
-
-ExecStart=/home/ubuntu/mydoorcare/venv/bin/gunicorn \
-          --access-logfile - \
-          --workers 3 \
-          --bind unix:/run/gunicorn.sock \
-          mydoorcare.wsgi:application
+[Socket]
+ListenStream=/run/gunicorn.sock
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=sockets.target

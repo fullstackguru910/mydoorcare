@@ -141,3 +141,6 @@
 • routeDetails (object)
 • polylineImage (string) – URL or base64 encoded image
 • Calculate Distance and Price:
+
+export DJANGO_SETTINGS_MODULE=mydoorcare.settings
+daphne -b 0.0.0.0 -p 8000 mydoorcare.asgi:application

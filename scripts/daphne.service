@@ -1,0 +1,27 @@
+[Unit]
+Description=Daphne daemon
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/mydoorcare
+
+Environment="MAILGUN_API_KEY="
+Environment="MAILGUN_SENDER_DOMAIN="
+Environment="DB_NAME=mydoorcare"
+Environment="DB_USER=mydoorcare"
+Environment="DB_PASSWORD=mydoorcare"
+Environment="DB_HOST=localhost"
+Environment="DB_PORT=5432"
+Environment="PGUSER=mydoorcare"
+Environment="SOCIAL_AUTH_GOOGLE_OAUTH2_KEY="
+Environment="SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET="
+
+ExecStart=/home/ubuntu/mydoorcare/venv/bin/daphne \
+          -u /tmp/daphne.sock \
+          mydoorcare.asgi:application
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
