@@ -1,57 +1,63 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Room, Message
-from .serializers import MessageSerializer
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = f"chat_{self.room_name}"
+        print('===================')
+        self.room_name = self.scope['url_route']['kwargs']['room_id']
+        self.room_group_name = f'chat_{self.room_name}'
 
-        # Join room group
+        # Join the room group
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
+
         await self.accept()
 
     async def disconnect(self, close_code):
-        # Leave room group
+        print('===================')
+        # Leave the room group
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
 
     async def receive(self, text_data):
+        print('===================')
         text_data_json = json.loads(text_data)
-        message_content = text_data_json['message']
-        sender = self.scope["user"]
-
+        message = text_data_json['message']
         room = Room.objects.get(name=self.room_name)
 
-        # Create new message
-        message = Message.objects.create(
+        # Create a new message
+        message_instance = Message.objects.create(
+            content=message,
             room=room,
-            sender=sender,
-            content=message_content
+            created_by=self.scope['user']
         )
 
-        # Serialize message
-        message_serializer = MessageSerializer(message)
-
-        # Broadcast message to room group
+        # Send the message to the room group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': message_serializer.data
+                'message': message_instance.content,
+                'user': message_instance.created_by.username,
+                'created_at': message_instance.created_at.isoformat(),
             }
         )
 
     async def chat_message(self, event):
+        print('===================')
         message = event['message']
+        user = event['user']
+        created_at = event['created_at']
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            'message': message
+            'message': message,
+            'user': user,
+            'created_at': created_at,
         }))

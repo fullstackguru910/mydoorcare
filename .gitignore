@@ -15,5 +15,6 @@ db.sqlite3
 # Virtual environment files
 venv/
 .env
+.env.prod
 .idea/
 .vscode/

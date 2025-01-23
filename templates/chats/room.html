@@ -1,0 +1,57 @@
+<!-- templates/chat/chat_room.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ room.name }}</title>
+</head>
+<body>
+    <h1>Room: {{ room.name }}</h1>
+
+    <div id="chat-log" style="border: 1px solid #ccc; height: 300px; overflow-y: scroll;">
+        {% for message in messages %}
+            <p><strong>{{ message.sender.username }}:</strong> {{ message.content }}</p>
+        {% endfor %}
+    </div>
+
+    <input type="text" id="chat-message-input" placeholder="Type your message..." />
+    <button id="send-button">Send</button>
+
+    <script>
+        const roomName = "{{ room.pk }}";
+        const username = "{{ request.user.username }}";
+        const chatSocket = new WebSocket(
+            `ws://${window.location.host}/ws/chat/${roomName}/`
+        );
+
+        const chatLog = document.getElementById('chat-log');
+        const messageInput = document.getElementById('chat-message-input');
+        const sendButton = document.getElementById('send-button');
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            const newMessage = `<p><strong>${data.username}:</strong> ${data.message}</p>`;
+            chatLog.innerHTML += newMessage;
+            chatLog.scrollTop = chatLog.scrollHeight; // Scroll to the bottom
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        sendButton.onclick = function() {
+            const message = messageInput.value;
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'username': username
+            }));
+            messageInput.value = ''; // Clear the input
+        };
+
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+    </script>
+</body>
+</html>
