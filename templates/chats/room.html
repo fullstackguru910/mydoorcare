@@ -17,41 +17,29 @@
     <button id="send-button">Send</button>
 
     <script>
-        const roomName = "{{ room.pk }}";
-        const username = "{{ request.user.username }}";
-        const chatSocket = new WebSocket(
-            `ws://${window.location.host}/ws/chat/${roomName}/`
-        );
+        const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
 
-        const chatLog = document.getElementById('chat-log');
-        const messageInput = document.getElementById('chat-message-input');
-        const sendButton = document.getElementById('send-button');
+        // chatSocket.onmessage = function(e) {
+        //     const data = JSON.parse(e.data);
+        //     const message = data['message'];
+        //     // Handle incoming message
+        // };
 
-        chatSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            const newMessage = `<p><strong>${data.username}:</strong> ${data.message}</p>`;
-            chatLog.innerHTML += newMessage;
-            chatLog.scrollTop = chatLog.scrollHeight; // Scroll to the bottom
-        };
+        // chatSocket.onclose = function(e) {
+        //     console.error('Chat socket closed unexpectedly');
+        // };
 
-        chatSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-        };
+        // // Send message to server
+        // function sendMessage(message) {
+        //     chatSocket.send(JSON.stringify({
+        //         'message': message
+        //     }));
+        // }
+        chatSocket.onopen = () => console.log('WebSocket connected');
+        chatSocket.onmessage = (e) => console.log('Message received:', e.data);
+        chatSocket.onerror = (e) => console.error('WebSocket error:', e);
+        chatSocket.onclose = () => console.log('WebSocket disconnected');
 
-        sendButton.onclick = function() {
-            const message = messageInput.value;
-            chatSocket.send(JSON.stringify({
-                'message': message,
-                'username': username
-            }));
-            messageInput.value = ''; // Clear the input
-        };
-
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendButton.click();
-            }
-        });
     </script>
 </body>
 </html>

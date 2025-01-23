@@ -62,10 +62,10 @@ INSTALLED_APPS = [
 
     'anymail',
 
+    'channels',
+
     'users',
     'chats',
-
-    'channels',
 ]
 
 MIDDLEWARE = [
